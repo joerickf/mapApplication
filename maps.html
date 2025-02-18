@@ -15,6 +15,7 @@
             margin-top: 20px;
         }
     </style>
+    
 </head>
 <body>
     <div class="container">
@@ -133,6 +134,15 @@
             markers.push(marker);
         }
 
+        function addSelfMarker(location) {
+            const marker = new google.maps.Marker({
+                position: {lat: location.lat, lng: location.lng},
+                map: map,
+            });
+
+            markers.push(marker);
+        }
+
         // Function to show all markers
         function showAllMarkers() {
             markers.forEach(marker => marker.setMap(map));
@@ -164,12 +174,7 @@
                     userMarker.setMap(null); // Remove previous marker
                     }
 
-                    userMarker = new google.maps.marker.AdvancedMarkerElement({
-                        position: userLocation,
-                        map: map,
-                        title: "You are here",
-                        content: icon_content
-                    });
+                    addSelfMarker(userLocation)
 
                     map.setCenter(userLocation);
                     map.setZoom(14);
