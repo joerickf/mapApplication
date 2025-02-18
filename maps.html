@@ -24,7 +24,7 @@
         <div class="text-center mb-3">
             <button class="btn btn-primary" id="showParks">Show Parks</button>
             <button class="btn btn-primary" id="showRestaurants">Show Restaurants</button>
-            <button class="btn btn-primary" id="showSchool">Show School</button>
+            <button class="btn btn-primary" id="showSchools">Show School</button>
             <button class="btn btn-primary" id="showAll">Show All</button>
         </div>
 
@@ -91,7 +91,8 @@
         function initMap() {
             map = new google.maps.Map(document.getElementById("map"), {
                 center: {lat: 43.255, lng: -79.871}, // Hamilton Coordinates
-                zoom: 12
+                zoom: 12,
+                map: "bba8efaa71d3ab6e"
             });
 
             // Adding markers from the array
@@ -105,6 +106,7 @@
             // Event listener for filter buttons
             document.getElementById("showParks").addEventListener("click", () => filterMarkers("park"));
             document.getElementById("showRestaurants").addEventListener("click", () => filterMarkers("restaurant"));
+            document.getElementById("showSchools").addEventListener("click", () => filterMarkers("school"));
             document.getElementById("showAll").addEventListener("click", showAllMarkers);
 
             // Handle new marker form submission
@@ -149,27 +151,32 @@
 
         // Function to geolocate the user and add a custom marker
         function geolocateUser() {
+            const icon_content = document.createElement("img");
+            icon_content.src = "http://maps.google.com/mapfiles/kml/shapes/poi.png";
             if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(position => {
-                const userLocation = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-                };
+                navigator.geolocation.getCurrentPosition(position => {
+                    const userLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                    };
 
-                if (userMarker) {
-                userMarker.setMap(null); // Remove previous marker
-                }
+                    if (userMarker) {
+                    userMarker.setMap(null); // Remove previous marker
+                    }
 
-                userMarker = new google.maps.marker.AdvancedMarkerElement({
-                position: userLocation,
-                map: map,
-                title: "You are here",
-                content: '<div style="background-color: blue; color: white; padding: 5px; border-radius: 5px;">You are here</div>'
-                });
+                    userMarker = new google.maps.marker.AdvancedMarkerElement({
+                        position: userLocation,
+                        map: map,
+                        title: "You are here",
+                        content: icon_content
+                    });
 
-                map.setCenter(userLocation);
-                map.setZoom(14);
-            });
+                    map.setCenter(userLocation);
+                    map.setZoom(14);
+                }, function error(err) {
+  console.warn(`ERROR(${err.code}): ${err.message}`);
+});
+                
             }
         }
 
