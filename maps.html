@@ -116,15 +116,16 @@
 
         // Function to add markers to the map
         function addMarker(location) {
+            let markerPosition = {lat: location.lat, lng: location.lng};
             const marker = new google.maps.Marker({
-                position: {lat: location.lat, lng: location.lng},
+                position: markerPosition,
                 map: map,
                 title: location.name,
                 category: location.category,
             });
 
             const infoWindow = new google.maps.InfoWindow({
-                content: `<h3>${location.name}</h3><p>Category: ${location.category}</p><p>Address: ${location.address}</p>`
+                content: `<h3>${location.name}</h3><p>Category: ${location.category}</p><p>Address: ${location.address}</p><button onclick="drawDirection(${location.lat},${location.lng})">Direction to here</button>`
             });
 
             marker.addListener("click", () => {
@@ -185,6 +186,23 @@
             }
         }
 
+        function getUserLatLng() {
+            const icon_content = document.createElement("img");
+            icon_content.src = "http://maps.google.com/mapfiles/kml/shapes/poi.png";
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+
+                    return userLocation
+                }, function error(err) {
+            console.warn(`ERROR(${err.code}): ${err.message}`);
+            });
+            }
+        }
+
         // Function to add a new marker from the form
         function addNewMarker(event) {
             event.preventDefault();
@@ -215,6 +233,41 @@
                 }
             });
         }
+
+        function drawDirection(endLat,endLng) {
+            const directionService = new google.maps.DirectionsService();
+            const directionRenderer = new google.maps.DirectionsRenderer();
+
+            directionRenderer.setMap(map)
+
+            calculationAndDisplayRoute(directionService, directionRenderer, endLat,endLng)
+
+        }
+
+function calculationAndDisplayRoute(directionService, directionRenderer,endLat,endLng) {
+    const userLocation = getUserLatLng();
+    console.log(userLocation, endLat,endLng)
+    const request = {
+        origin: {lat: parseInt(userLocatio), lng: parseInt(userLocation.lng)},
+        destination: {lat: parseInt(endLat), lng: parseInt(endLng)},
+        travelMode: google.maps.DirectionsTravelMode.DRIVING
+    }
+
+    directionService.route(request, function (response, status) {
+        if( status === google.maps.DirectionsStatus.OK ) {
+            directionRenderer.setDirections(response)
+            let myRoute = response.routes[0]
+            let txt = ''
+            for (let i = 0; i < myRoute.legs[0].steps.length; i++) {
+                txt += myRoute.legs[0].steps[i].instructions + "<br />"
+            }
+
+            document.getElementById('directions').innerHTML = txt
+
+        }
+        });
+
+    }
     </script>
 </body>
 </html>
