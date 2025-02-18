@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map Application</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+        .container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Map Application</h1>
+
+        <!-- Buttons for filtering -->
+        <div class="text-center mb-3">
+            <button class="btn btn-primary" id="showParks">Show Parks</button>
+            <button class="btn btn-primary" id="showRestaurants">Show Restaurants</button>
+            <button class="btn btn-primary" id="showAll">Show All</button>
+        </div>
+
+        <!-- Map container -->
+        <div id="map"></div>
+
+        <!-- Form to add new marker -->
+        <div class="mt-4">
+            <h3>Add a New Marker</h3>
+            <form id="markerForm">
+                <div class="mb-3">
+                    <label for="address" class="form-label">Address</label>
+                    <input type="text" id="address" class="form-control" placeholder="Enter address">
+                </div>
+                <div class="mb-3">
+                    <label for="category" class="form-label">Category</label>
+                    <select id="category" class="form-select">
+                        <option value="park">Park</option>
+                        <option value="restaurant">Restaurant</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="name" class="form-label">Location Name</label>
+                    <input type="text" id="name" class="form-control" placeholder="Location Name">
+                </div>
+                <button type="submit" class="btn btn-success">Add Marker</button>
+            </form>
+        </div>
+
+        <!-- Geolocation button -->
+        <div class="mt-4 text-center">
+            <button class="btn btn-info" id="geolocate">Use My Location</button>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS & Google Maps API -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
+    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDyKgngxb3e6XfjYl36DopmXYjNW0fyn_E&loading=async&callback=initMap&libraries=marker
+    "></script>
+
+
+    <script>
+        let map;
+        let markers = [];
+        let userMarker;
+
+        const locations = [
+            {lat: 43.255, lng: -79.871, name: 'Park 1', category: 'park'},
+            {lat: 43.259, lng: -79.875, name: 'Restaurant 1', category: 'restaurant'},
+            // Add more locations here...
+        ];
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: {lat: 43.255, lng: -79.871}, // Hamilton Coordinates
+                zoom: 12
+            });
+
+            // Adding markers from the array
+            locations.forEach(location => {
+                addMarker(location);
+            });
+
+            // Event listener for geolocation button
+            document.getElementById("geolocate").addEventListener("click", geolocateUser);
+
+            // Event listener for filter buttons
+            document.getElementById("showParks").addEventListener("click", () => filterMarkers("park"));
+            document.getElementById("showRestaurants").addEventListener("click", () => filterMarkers("restaurant"));
+            document.getElementById("showAll").addEventListener("click", showAllMarkers);
+
+            // Handle new marker form submission
+            document.getElementById("markerForm").addEventListener("submit", addNewMarker);
+        }
+
+        // Function to add markers to the map
+        function addMarker(location) {
+            const marker = new google.maps.Marker({
+                position: {lat: location.lat, lng: location.lng},
+                map: map,
+                title: location.name,
+                category: location.category,
+            });
+
+            const infoWindow = new google.maps.InfoWindow({
+                content: `<h3>${location.name}</h3><p>Category: ${location.category}</p>`
+            });
+
+            marker.addListener("click", () => {
+                infoWindow.open(map, marker);
+            });
+
+            markers.push(marker);
+        }
+
+        // Function to show all markers
+        function showAllMarkers() {
+            markers.forEach(marker => marker.setMap(map));
+        }
+
+        // Function to filter markers by category
+        function filterMarkers(category) {
+            markers.forEach(marker => {
+                if (marker.category === category) {
+                    marker.setMap(map);
+                } else {
+                    marker.setMap(null);
+                }
+            });
+        }
+
+        // Function to geolocate the user and add a custom marker
+        function geolocateUser() {
+            if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(position => {
+                const userLocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+                };
+
+                if (userMarker) {
+                userMarker.setMap(null); // Remove previous marker
+                }
+
+                userMarker = new google.maps.marker.AdvancedMarkerElement({
+                position: userLocation,
+                map: map,
+                title: "You are here",
+                content: '<div style="background-color: blue; color: white; padding: 5px; border-radius: 5px;">You are here</div>'
+                });
+
+                map.setCenter(userLocation);
+                map.setZoom(14);
+            });
+            }
+        }
+
+        // Function to add a new marker from the form
+        function addNewMarker(event) {
+            event.preventDefault();
+
+            const address = document.getElementById("address").value;
+            const category = document.getElementById("category").value;
+            const name = document.getElementById("name").value;
+
+            if (!address || !category || !name) {
+                alert("Please fill all fields.");
+                return;
+            }
+
+            // Geocode the address
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ address: address }, (results, status) => {
+                if (status === "OK") {
+                    const newLocation = {
+                        lat: results[0].geometry.location.lat(),
+                        lng: results[0].geometry.location.lng(),
+                        name: name,
+                        category: category
+                    };
+
+                    addMarker(newLocation);
+                } else {
+                    alert("Geocode was not successful for the following reason: " + status);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
