@@ -75,16 +75,16 @@
         let userMarker;
 
         const locations = [
-            {lat: 43.255, lng: -79.871, name: 'Park 1', category: 'park'},
-            {lat: 43.259, lng: -79.875, name: 'Restaurant 1', category: 'restaurant'},
-            {lat: 43.227276451053186, lng: -79.8957972184887, name: 'Westmount Secondary School', category: 'school'},
-            {lat: 43.22598898279445, lng: -79.89420816241999, name: 'Westview Elementary School', category: 'school'},
-            {lat: 43.22244303301848, lng: -79.9081610063385, name: 'RA Ridell Elementary School', category: 'school'},
-            {lat: 43.230256401059705, lng: -79.87711162218649, name: 'Northwood Park Elementary School', category: 'school'},
-            {lat: 43.24148575964638, lng: -79.84941233268546, name: 'Engs Chinese Restaurant', category: 'restaurant'},
-            {lat: 43.20409333664409, lng: -79.89156804368211, name: 'Sasso Pizza', category: 'restaurant'},
-            {lat: 43.238921476792946, lng: -79.80124839746132, name: 'Montgomery Park', category: 'park'},
-            {lat: 43.203640718510556, lng: -79.89790807243897, name: 'Kennedy Park', category: 'park'}
+            {lat: 43.25912039730689, lng: -79.86784036715864, name: 'Grove Park', category: 'park', address: "Gore Park, 1 Hughson St S, Hamilton, ON L8N, Canada, Canada"},
+            {lat: 43.25112971451995, lng: -79.8174191907665, name: 'Hamilton Dabbawala', category: 'restaurant', address: "Hamilton Dabbawala, 1229 Cannon St E, Hamilton, ON L8H 4B9, Canada"},
+            {lat: 43.227276451053186, lng: -79.8957972184887, name: 'Westmount Secondary School', category: 'school', address:""},
+            {lat: 43.22598898279445, lng: -79.89420816241999, name: 'Westview Elementary School', category: 'school', address:""},
+            {lat: 43.22244303301848, lng: -79.9081610063385, name: 'RA Ridell Elementary School', category: 'school', address:""},
+            {lat: 43.230256401059705, lng: -79.87711162218649, name: 'Northwood Park Elementary School', category: 'school', address:""},
+            {lat: 43.24148575964638, lng: -79.84941233268546, name: 'Engs Chinese Restaurant', category: 'restaurant', address:""},
+            {lat: 43.20409333664409, lng: -79.89156804368211, name: 'Sasso Pizza', category: 'restaurant', address:""},
+            {lat: 43.238921476792946, lng: -79.80124839746132, name: 'Montgomery Park', category: 'park', address:""},
+            {lat: 43.203640718510556, lng: -79.89790807243897, name: 'Kennedy Park', category: 'park', address:""}
             // Add more locations here...
         ];
 
@@ -121,7 +121,7 @@
             });
 
             const infoWindow = new google.maps.InfoWindow({
-                content: `<h3>${location.name}</h3><p>Category: ${location.category}</p>`
+                content: `<h3>${location.name}</h3><p>Category: ${location.category}</p><p>Address: ${location.address}</p>`
             });
 
             marker.addListener("click", () => {
